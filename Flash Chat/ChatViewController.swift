@@ -13,13 +13,12 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     // Declare instance variables here
     var messageArray = [Message]()
-    
+    var myTxt: [(messageBody: String, userName: String)] = []
     // We've pre-linked the IBOutlets
     @IBOutlet var heightConstraint: NSLayoutConstraint!
     @IBOutlet var sendButton: UIButton!
     @IBOutlet var messageTextfield: UITextField!
     @IBOutlet var messageTableView: UITableView!
-    
     
     
     override func viewDidLoad() {
@@ -55,27 +54,47 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     
     //TODO: Declare cellForRowAtIndexPath here:
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 2
+    }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell1 = tableView.dequeueReusableCell(withIdentifier: "customMessageCell1", for: indexPath) as! CustomMessageCell
-        cell1.messageBody.text = messageArray[indexPath.row].messageBody
-        cell1.senderUsername.text = messageArray[indexPath.row].sender
-        cell1.avatarImageView.image = UIImage(named: "egg")
         
+        switch indexPath.section {
+        case 0:
+            let cell = tableView.dequeueReusableCell(withIdentifier: "customMessageCell1", for: indexPath) as! CustomMessageCell
+            cell.messageBody.text = messageArray[indexPath.row].messageBody
+            cell.senderUsername.text = messageArray[indexPath.row].sender
+            cell.avatarImageView.image = UIImage(named: "egg")
+            return cell
+            
+        case 1:
+            let myTxtCell = tableView.dequeueReusableCell(withIdentifier: "customMessageCell2", for: indexPath) as! VustomMessageCell2TableViewCell
+            myTxtCell.messageBody2.text = myTxt[indexPath.row].messageBody
+            myTxtCell.senderUsername2.text = myTxt[indexPath.row].userName
+            myTxtCell.avatarImageView2.image = UIImage(named: "egg")
+            return myTxtCell
+            
+        default: return UITableViewCell()
+        }
         
-//        let cell2 = tableView.dequeueReusableCell(withIdentifier: "customMessageCell2", for: indexPath) as! VustomMessageCell2TableViewCell
-//        cell2.messageBody2.text = messageArray[indexPath.row].messageBody
-//        cell2.senderUsername2.text = messageArray[indexPath.row].sender
-//        cell2.avatarImageView2.image = UIImage(named: "egg")
-        
-        return cell1
     }
     
     
     //TODO: Declare numberOfRowsInSection here:
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return messageArray.count
+        if section == 0 {
+            return messageArray.count
+        } else if section == 1 {
+            return myTxt.count
+        } else {
+            return 0
+        }
     }
     
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 90.0
+    }
     
     //TODO: Declare tableViewTapped here:
     @objc func tableviewTapped() {
@@ -91,6 +110,13 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         
     }
     
+    // MARK: - Second Cell Methode
+
+    func configMytxtCell() {
+        guard let message = self.messageTextfield.text else {return}
+        self.myTxt.append((messageBody: message, userName: "ali khar ast"))
+        self.messageTableView.reloadData()
+    }
     
     ///////////////////////////////////////////
     
@@ -103,7 +129,7 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     func textFieldDidBeginEditing(_ textField: UITextField) {
         
         UIView.animate(withDuration: 1) {
-            self.heightConstraint.constant = 308
+            self.heightConstraint.constant = 308 + 40
             self.view.layoutIfNeeded()
         }
     }
@@ -130,8 +156,19 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     @IBAction func sendPressed(_ sender: AnyObject) {
         
+        let message = Message(sender: "test", messageBody: "asdasdasd")
+        messageArray.append(message)
+        messageTableView.reloadData()
+        
+        self.delay(1) {
+            self.configMytxtCell()
+        }
+
+        
+        /*
         messageTextfield.endEditing(true)
         //TODO: Send the message to Firebase and save it in our database
+
         messageTextfield.isEnabled = false
         sendButton.isEnabled = false
         
@@ -150,6 +187,7 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
             }
            
         }
+        */
         
     }
     
@@ -162,9 +200,7 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
             let sender = snapshotValue["Sender"]!
             print(sender, text)
             
-            let message = Message()
-            message.sender = sender
-            message.messageBody = text
+            let message = Message(sender: sender, messageBody: text)
             
             self.messageArray.append(message)
             self.configureTableView()
@@ -190,5 +226,12 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
 
+    // MARK: - Delay
+    
+    func delay(_ delay:Double, closure:@escaping ()->()) {
+        DispatchQueue.main.asyncAfter(
+            deadline: DispatchTime.now() + Double(Int64(delay * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC), execute: closure)
+        return
+    }
 
 }

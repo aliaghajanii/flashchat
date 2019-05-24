@@ -13,8 +13,8 @@ class VustomMessageCell2TableViewCell: UITableViewCell {
     @IBOutlet weak var messageBackground2: UIView!
     @IBOutlet weak var avatarImageView2: UIImageView!
     @IBOutlet weak var senderUsername2: UILabel!
-    
     @IBOutlet weak var messageBody2: UILabel!
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

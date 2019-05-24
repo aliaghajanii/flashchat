@@ -25,12 +25,14 @@ class LogInViewController: UIViewController {
 
    
     @IBAction func logInPressed(_ sender: AnyObject) {
-        
+        self.performSegue(withIdentifier: "goToChat", sender: self)
+
+        /*
         SVProgressHUD.show()
 
         
         //TODO: Log in the user
-        Auth.auth().signIn(withEmail: emailTextfield.text!, password: passwordTextfield.text!) { (user, error) in
+        Auth.auth().signIn(withEmail: "a@b.com", password: "123456") { (user, error) in
             if error != nil {
                 print("error!")
             }
@@ -39,6 +41,7 @@ class LogInViewController: UIViewController {
                 SVProgressHUD.dismiss()
             }
         }
+        */
         
     }
     
